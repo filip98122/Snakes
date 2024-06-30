@@ -53,6 +53,7 @@ class snake:
         if keys(pygame.K_LEFT) or keys(pygame.K_a):
             self.direction_x = -1
             self.direction_y = 0
+            
 
 
 
