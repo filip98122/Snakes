@@ -47,39 +47,44 @@ class Part:
 
 
 class Snake:
-    def __init__(self,rad,krugovi,x,y,):
+    def __init__(self,rad,krugovi,x,y):
         self.rad = rad
         self.krugovi = krugovi
-        self.distance = 8
+        self.distance = 7
+        self.speed = 5
+        self.head_pos = []
+        self.amount_to_track = 600
         self.body = [Part(x,y,self.rad,"head")]
+        for i in range(600):
+            self.head_pos.append([self.body[0].x,self.body[0].y])
         for i in range(krugovi-1):
             self.body.append(Part(x-self.distance*i,y,self.rad,"body"))
     def draw(self,window):
-        for i in range(len(self.body)):
+        for i in range(len(self.body)-1,-1,-1):
             self.body[i].draw(window)
             
     def move(self, keys):
-        
-        for i in range(len(self.body)-1,0,-1):
-            self.body[i] = self.body[i-1]
-            
+        if len(self.head_pos)>self.amount_to_track:
+            del self.head_pos[0]
+        for i in range(1,self.krugovi):
+            self.body[i].x = self.head_pos[len(self.head_pos)-self.distance*i][0]
+            self.body[i].y = self.head_pos[len(self.head_pos)-self.distance*i][1]
         self.body[0].x += self.body[0].dx
         self.body[0].y += self.body[0].dy
-        if keys[pygame.K_DOWN] and self.body[0].dy != -self.distance or keys[pygame.K_s] and self.body[0].dy != -self.distance:
+        if keys[pygame.K_DOWN] and self.body[0].dy != -self.speed or keys[pygame.K_s] and self.body[0].dy != -self.speed:
             self.body[0].dx = 0
-            self.body[0].dy = self.distance
-        if keys[pygame.K_UP] and self.body[0].dy != self.distance or keys[pygame.K_w] and self.body[0].dy != self.distance:
+            self.body[0].dy = self.speed
+        if keys[pygame.K_UP] and self.body[0].dy != self.speed or keys[pygame.K_w] and self.body[0].dy != self.speed:
             self.body[0].dx = 0
-            self.body[0].dy = -self.distance
-        if keys[pygame.K_RIGHT] and self.body[0].dx != -self.distance or keys[pygame.K_d] and self.body[0].dx != -self.distance:
-            self.body[0].dx = self.distance
+            self.body[0].dy = -self.speed
+        if keys[pygame.K_RIGHT] and self.body[0].dx != -self.speed or keys[pygame.K_d] and self.body[0].dx != -self.speed:
+            self.body[0].dx = self.speed
             self.body[0].dy = 0
-        if keys[pygame.K_LEFT] and self.body[0].dx != self.distance or keys[pygame.K_a] and self.body[0].dx != self.distance:
-            self.body[0].dx = -self.distance
+        if keys[pygame.K_LEFT] and self.body[0].dx != self.speed or keys[pygame.K_a] and self.body[0].dx != self.speed:
+            self.body[0].dx = -self.speed
             self.body[0].dy = 0
         
-        #update body
-        
+        self.head_pos.append([self.body[0].x,self.body[0].y])
 class Apple:
     def __init__(self,x,y,rad):
         self.x = x
@@ -103,7 +108,7 @@ class text:
         self.window = window
     def draw(self):
         pass
-s1 = Snake(30,5,0.15,0)
+s1 = Snake(30,5,100,100)
 apple = []
 score = 0
 game = 1
@@ -117,6 +122,7 @@ while game:
     events = pygame.event.get()
     mouseState = pygame.mouse.get_pressed()
     mousePos = pygame.mouse.get_pos()
+
     for event in events:
         if event.type == pygame.QUIT:            exit()
     if keys[pygame.K_ESCAPE]:        exit()
@@ -125,6 +131,9 @@ while game:
         y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
         a1 = Apple(x_a,y_a,35)
         s1.krugovi += 1
+        #s1.body.append(Part(s1.head_pos[len(s1.head_pos)-60*(s1.krugovi)]-s1.distance*i,y,s1.rad,"body"))
+        s1.body.append(Part(0,0,s1.rad,"body"))
+        s1.amount_to_track+=60
         score+=1
     s1.move(keys)
     
