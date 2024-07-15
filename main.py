@@ -26,6 +26,19 @@ def button_colision(width,height,x,y,mousePos,mouseState):
         return True
     else:
         return False
+    
+class Backround:
+    def __init__(self,window):
+        self.window = window
+        self.scale = 3.5
+        self.sprite_img = pygame.image.load('gra.png')
+        self.width = self.sprite_img.get_width()*self.scale
+        self.height = self.sprite_img.get_height()*self.scale
+        self.scaled_img = pygame.transform.scale(self.sprite_img, (self.width, self.height))
+    def draw(self):
+        self.width = self.scaled_img.get_width()
+        self.height = self.scaled_img.get_height()
+        window.blit(self.scaled_img, (0,0))
 class Part:
     def __init__(self,x,y,rad,id):
         self.x = x
@@ -109,7 +122,7 @@ class Text:
             hs = score
         text_surface1 = self.myfont1.render(f"Highscore: {int(hs)}", True, (0, 0, 0))
         self.window.blit(text_surface1,(10,30))
-s1 = Snake(30,5,100,100)
+s1 = Snake(25,5,100,100)
 apple = []
 score = 0
 game = 1
@@ -134,6 +147,7 @@ def shutdown():
         write(score)
     exit()
 
+b1 = Backround(window)
 t1 = Text(window)
 x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
 y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
@@ -141,6 +155,7 @@ a1 = Apple(x_a,y_a,35)
 apple.append(a1)
 while game:
     window.fill("White")
+    b1.draw()
     keys = pygame.key.get_pressed()
     events = pygame.event.get()
     mouseState = pygame.mouse.get_pressed()

@@ -1,0 +1,8 @@
+{
+    "highscore": 5,
+    "gold": 0,
+    "upgrades": 
+        {"2xspeed": false,
+        "DoubleFruit": false
+        }
+}
