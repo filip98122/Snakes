@@ -10,7 +10,7 @@ def collison(x1,y1,r1,x2,y2,r2):
     dist  = dx * dx + dy * dy
     dist = math.sqrt(dist)
     
-    if dist > r1 + r2:
+    if dist >= (r1 + r2 - (((r1+r2)/2)*0.2)):
         return False
     else:
         return True
@@ -73,11 +73,21 @@ class Snake:
         for i in range(len(self.body)-1,-1,-1):
             self.body[i].draw(window)
     def move(self, keys):
+        global started_moving
+        tmp_start_x = self.body[0].x
+        tmp_start_y = self.body[0].y
+        
         if len(self.head_pos)>self.amount_to_track:
             del self.head_pos[0]
         for i in range(1,self.krugovi):
             self.body[i].x = self.head_pos[len(self.head_pos)-self.distance*i][0]
             self.body[i].y = self.head_pos[len(self.head_pos)-self.distance*i][1]
+        for i in range(2,self.krugovi):
+            if spawn_immunity<=0:
+                if collison(self.body[0].x,self.body[0].y,self.rad,self.body[i].x,self.body[i].y,self.rad):
+                    shutdown()
+                    pass
+
         self.body[0].x += self.body[0].dx
         self.body[0].y += self.body[0].dy
         if keys[pygame.K_DOWN] and self.body[0].dy != -self.speed or keys[pygame.K_s] and self.body[0].dy != -self.speed:
@@ -96,6 +106,8 @@ class Snake:
             shutdown()
             
         self.head_pos.append([self.body[0].x,self.body[0].y])
+        if tmp_start_x != self.body[0].x or tmp_start_y != self.body[0].y:
+            started_moving=True
 class Apple:
     def __init__(self,x,y,rad):
         self.x = x
@@ -126,7 +138,7 @@ s1 = Snake(25,5,100,100)
 apple = []
 score = 0
 game = 1
-
+s11 = 0
 def read():
     f = open("test.txt", "r")
     highscore = f.read()
@@ -153,7 +165,11 @@ x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
 y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
 a1 = Apple(x_a,y_a,35)
 apple.append(a1)
+spawn_immunity = 300
+started_moving = False
 while game:
+    if started_moving == True:
+        spawn_immunity -=1
     window.fill("White")
     b1.draw()
     keys = pygame.key.get_pressed()
@@ -163,7 +179,8 @@ while game:
     for event in events:
         if event.type == pygame.QUIT:
             shutdown()
-            
+    if s11 != 600:
+        s11+=1
     if keys[pygame.K_ESCAPE]:
         shutdown()
         
