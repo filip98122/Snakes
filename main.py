@@ -104,6 +104,7 @@ class Snake:
             self.body[0].dy = 0
         if self.body[0].x < self.rad or self.body[0].x > WIDTH-self.rad or self.body[0].y < self.rad or self.body[0].y > HEIGHT-self.rad:
             shutdown()
+
             
         self.head_pos.append([self.body[0].x,self.body[0].y])
         if tmp_start_x != self.body[0].x or tmp_start_y != self.body[0].y:
@@ -121,12 +122,30 @@ class Apple:
         self.width = self.scaled_img.get_width()
         self.height =self.scaled_img.get_height()
         window.blit(self.scaled_img, (self.x - self.width/2, self.y - self.height/2))
+        
+        
+class Button:
+    def __init__(self,x,y,width,height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+    def draw(self,window):
+        pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
+        
+l_buttons = []
+button = Button(307,200,150,100)
+l_buttons.append(button)
+button = Button(307,375,150,100)
+l_buttons.append(button)
+
 class Text:
     def __init__(self,window):
         self.myfont = pygame.font.SysFont('Comic Sans MS', 70)
         self.myfont1 = pygame.font.SysFont('Comic Sans MS', 15)
+        self.myfont2 = pygame.font.SysFont('Comic Sans MS', 45)
         self.window = window
-    def draw(self,kru,score):
+    def draw_score(self,kru,score):
         text_surface = self.myfont1.render(f"Score: {int(kru-5)}", True, (0, 0, 0))
         self.window.blit(text_surface,(10,10))
         hs = read()
@@ -134,11 +153,21 @@ class Text:
             hs = score
         text_surface1 = self.myfont1.render(f"Highscore: {int(hs)}", True, (0, 0, 0))
         self.window.blit(text_surface1,(10,30))
+    def draw_button_text(self,window):
+        text_surface = self.myfont.render(f"Main Menu", True, (255, 0, 0))
+        self.window.blit(text_surface,(225,50))
+        
+        text_surface1 = self.myfont2.render(f"Play", True, (255, 255, 255))
+        self.window.blit(text_surface1,(330,210))
+        
+        text_surface2 = self.myfont2.render(f"Shop", True, (255, 255, 255))
+        self.window.blit(text_surface2,(330,385))
 s1 = Snake(25,5,100,100)
 apple = []
 score = 0
+
 game = 1
-s11 = 0
+
 def read():
     f = open("test.txt", "r")
     highscore = f.read()
@@ -154,10 +183,13 @@ def write(highscore):
     return hk
 
 def shutdown():
+    global game
+    global main_menu
     hs = read()
     if score > hs:
         write(score)
-    exit()
+    game = 0
+    main_menu = 1
 
 b1 = Backround(window)
 t1 = Text(window)
@@ -167,34 +199,89 @@ a1 = Apple(x_a,y_a,35)
 apple.append(a1)
 spawn_immunity = 300
 started_moving = False
-while game:
-    if started_moving == True:
-        spawn_immunity -=1
-    window.fill("White")
-    b1.draw()
-    keys = pygame.key.get_pressed()
-    events = pygame.event.get()
-    mouseState = pygame.mouse.get_pressed()
-    mousePos = pygame.mouse.get_pos()
-    for event in events:
-        if event.type == pygame.QUIT:
+main_menu = 0
+wait = 0
+
+
+
+
+while True:
+    if main_menu == 1:
+        window.fill("White")
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                if wait <= 0:
+                    exit()
+                
+        if keys[pygame.K_ESCAPE]:
+            if wait <= 0:
+                exit()
+        for i in range(len(l_buttons)):
+            l_buttons[i].draw(window)
+        t1.draw_button_text(window)
+        if wait >= 0:
+            wait-=1
+        if button_colision(150,100,307,200,mousePos,mouseState):
+            game = 1
+            main_menu = 0
+            spawn_immunity = 300
+            started_moving = False
+            s1.body[0].x = 100
+            s1.body[0].y = 100
+            s1.krugovi = 5
+            s1.body[0].dx = 0
+            s1.body[0].dy = 0
+            score = 0
+            del s1.body
+            s1.body = [(Part(100,100,25,"head"))]
+            for i in range(600):
+                s1.head_pos.append([s1.body[0].x,s1.body[0].y])
+            for i in range(s1.krugovi-1):
+                s1.body.append((Part(100,100,25,"body")))
+
+#.............................
+#.............................
+#.............................
+#.............................
+#.............................
+#.............................
+#.............................
+#.............................
+    if game == 1:
+        if started_moving == True:
+            spawn_immunity -=1
+        window.fill("White")
+        b1.draw()
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                shutdown()
+                wait = 90
+        if keys[pygame.K_ESCAPE]:
             shutdown()
-    if s11 != 600:
-        s11+=1
-    if keys[pygame.K_ESCAPE]:
-        shutdown()
-        
-    if collison(a1.x,a1.y,a1.rad,s1.body[0].x,s1.body[0].y,s1.rad):
-        x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
-        y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
-        a1 = Apple(x_a,y_a,35)
-        s1.krugovi += 1
-        s1.body.append(Part(0,0,s1.rad,"body"))
-        s1.amount_to_track+=60
-        score+=1
-    s1.move(keys)
-    s1.draw(window)
-    a1.draw(window)
-    t1.draw(s1.krugovi,score)
+            wait = 90
+        if collison(a1.x,a1.y,a1.rad,s1.body[0].x,s1.body[0].y,s1.rad):
+            x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
+            y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
+            for i in range(s1.krugovi):
+                if collison(x_a,y_a,a1.rad,s1.body[i].x,s1.body[i].y,s1.rad):
+                    x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
+                    y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
+            a1 = Apple(x_a,y_a,35)
+            s1.krugovi += 1
+            s1.body.append(Part(-50,-50,s1.rad,"body"))
+            s1.amount_to_track+=60
+            score+=1
+        s1.move(keys)
+        s1.draw(window)
+        a1.draw(window)
+        t1.draw_score(s1.krugovi,score)
     pygame.display.update()
     clock.tick(60)
