@@ -3,6 +3,7 @@ import pygame
 import random
 import math
 import time
+import json
 pygame.init()
 def collison(x1,y1,r1,x2,y2,r2):
     dx = x2 - x1
@@ -27,6 +28,12 @@ def button_colision(width,height,x,y,mousePos,mouseState):
     else:
         return False
     
+    
+    
+    
+    
+    
+    
 class Backround:
     def __init__(self,window):
         self.window = window
@@ -35,10 +42,28 @@ class Backround:
         self.width = self.sprite_img.get_width()*self.scale
         self.height = self.sprite_img.get_height()*self.scale
         self.scaled_img = pygame.transform.scale(self.sprite_img, (self.width, self.height))
-    def draw(self):
-        self.width = self.scaled_img.get_width()
-        self.height = self.scaled_img.get_height()
-        window.blit(self.scaled_img, (0,0))
+        
+        self.sprite_img1 = pygame.image.load('store.png')
+        self.width1 = self.sprite_img.get_width()*self.scale
+        self.height1 = self.sprite_img.get_height()*self.scale
+        self.scaled_img1 = pygame.transform.scale(self.sprite_img1, (self.width1, self.height1))
+        
+        self.width = self.scaled_img1.get_width()
+        self.height = self.scaled_img1.get_height()
+    def draw(self,shop,game):
+        if shop == 1:
+            window.blit(self.scaled_img1,(0,0))
+        if game == 1:
+            self.width = self.scaled_img.get_width()
+            self.height = self.scaled_img.get_height()
+            window.blit(self.scaled_img, (0,0))
+            
+            
+            
+            
+            
+            
+            
 class Part:
     def __init__(self,x,y,rad,id):
         self.x = x
@@ -56,6 +81,12 @@ class Part:
         if self.id == "body":
                 pygame.draw.circle(window,pygame.Color(255,255,0),(self.x,self.y),self.rad)
                 pygame.draw.circle(window,pygame.Color(255,100,10),(self.x,self.y),self.rad-10)
+                
+                
+                
+                
+                
+                
 class Snake:
     def __init__(self,rad,krugovi,x,y):
         self.rad = rad
@@ -85,7 +116,7 @@ class Snake:
         for i in range(2,self.krugovi):
             if spawn_immunity<=0:
                 if collison(self.body[0].x,self.body[0].y,self.rad,self.body[i].x,self.body[i].y,self.rad):
-                    shutdown()
+                    shutdown(info,score)
                     pass
 
         self.body[0].x += self.body[0].dx
@@ -103,12 +134,22 @@ class Snake:
             self.body[0].dx = -self.speed
             self.body[0].dy = 0
         if self.body[0].x < self.rad or self.body[0].x > WIDTH-self.rad or self.body[0].y < self.rad or self.body[0].y > HEIGHT-self.rad:
-            shutdown()
+            shutdown(info,score)
 
             
         self.head_pos.append([self.body[0].x,self.body[0].y])
         if tmp_start_x != self.body[0].x or tmp_start_y != self.body[0].y:
             started_moving=True
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
 class Apple:
     def __init__(self,x,y,rad):
         self.x = x
@@ -123,21 +164,75 @@ class Apple:
         self.height =self.scaled_img.get_height()
         window.blit(self.scaled_img, (self.x - self.width/2, self.y - self.height/2))
         
+    
+    
+    
+    
+    
+class Storekeeper:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        self.sprite_img = pygame.image.load('sopkeeper.png')
+        self.width = self.sprite_img.get_width()*0.23
+        self.height = self.sprite_img.get_height()*0.23
+        self.scaled_img = pygame.transform.scale(self.sprite_img, (self.width, self.height))
+    def draw(self,window):
+        self.width = self.scaled_img.get_width()
+        self.height =self.scaled_img.get_height()
+        window.blit(self.scaled_img, (self.x - self.width/2, self.y - self.height/2))
         
+shopk = Storekeeper(625,605)
+
+
+
+
+
+
+
 class Button:
-    def __init__(self,x,y,width,height):
+    def __init__(self,x,y,width,height,ID):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-    def draw(self,window):
-        pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
+        self.ID = ID
+        self.myfont = pygame.font.SysFont('Comic Sans MS', 70)
+        self.myfont1 = pygame.font.SysFont('Comic Sans MS', 15)
+        self.myfont2 = pygame.font.SysFont('Comic Sans MS', 45)
+    def draw_m(self,window):
+        if self.ID == "main_menu":
+            pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
+    def draw_s(self,window):
+        if self.ID == "shop":
+            pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
+    def draw_t(self,window):
+        text_surface = self.myfont2.render(f"Geon", True, (255, 255, 255))
+        window.blit(text_surface,(63,185))
+        
+        text_surface1 = self.myfont2.render(f"Gold", True, (255, 255, 255))
+        window.blit(text_surface1,(240,185))
+        
+        text_surface2 = self.myfont1.render(f"Multiplyer", True, (255, 255, 255))
+        #window.blit(text_surface2,(240,385))
+
+        
+        
         
 l_buttons = []
-button = Button(307,200,150,100)
+button = Button(307,200,150,100,"main_menu")
 l_buttons.append(button)
-button = Button(307,375,150,100)
+button = Button(307,375,150,100,"main_menu")
 l_buttons.append(button)
+button = Button(40,175,150,100,"shop")
+l_buttons.append(button)
+button = Button(215,175,150,100,"shop")
+l_buttons.append(button)
+button = Button(390,175,150,100,"shop")
+l_buttons.append(button)
+button = Button(565,175,150,100,"shop")
+l_buttons.append(button)
+
 
 class Text:
     def __init__(self,window):
@@ -145,10 +240,10 @@ class Text:
         self.myfont1 = pygame.font.SysFont('Comic Sans MS', 15)
         self.myfont2 = pygame.font.SysFont('Comic Sans MS', 45)
         self.window = window
-    def draw_score(self,kru,score):
+    def draw_score(self,kru,game_info,score):
         text_surface = self.myfont1.render(f"Score: {int(kru-5)}", True, (0, 0, 0))
         self.window.blit(text_surface,(10,10))
-        hs = read()
+        hs = game_info["highscore"]
         if hs<score:
             hs = score
         text_surface1 = self.myfont1.render(f"Highscore: {int(hs)}", True, (0, 0, 0))
@@ -157,39 +252,38 @@ class Text:
         text_surface = self.myfont.render(f"Main Menu", True, (255, 0, 0))
         self.window.blit(text_surface,(225,50))
         
-        text_surface1 = self.myfont2.render(f"Play", True, (255, 255, 255))
-        self.window.blit(text_surface1,(330,210))
-        
-        text_surface2 = self.myfont2.render(f"Shop", True, (255, 255, 255))
-        self.window.blit(text_surface2,(330,385))
 s1 = Snake(25,5,100,100)
 apple = []
 score = 0
-
+shop = 0
 game = 1
 
-def read():
-    f = open("test.txt", "r")
-    highscore = f.read()
-    hk = int(highscore)
+def read(): # returns all gane info 
+    f = open("test.json", "r")
+    res = f.read()
+    res = json.loads(res)
     f.close()
-    return hk
+    return res
     
-def write(highscore):
-    f = open("test.txt", "w")
-    f.write(str(highscore))
-    hk = int(highscore)
+def write(info,score):
+    hs = info["highscore"]
+    if score>hs:
+        info["highscore"] = score
+    f = open("test.json", "w")
+    info = json.dumps(info)
+    f.write(info)
     f.close()
-    return hk
 
-def shutdown():
+
+def shutdown(info,score):
+    global shop
     global game
     global main_menu
-    hs = read()
-    if score > hs:
-        write(score)
+    if score > info["highscore"]:
+        write(info,score)
     game = 0
     main_menu = 1
+    shop = 0
 
 b1 = Backround(window)
 t1 = Text(window)
@@ -202,6 +296,25 @@ started_moving = False
 main_menu = 0
 wait = 0
 
+
+dict_1 = {
+    "gold": 0,
+    "highscore": 41,
+    "upgrades": {
+        "fruit": 0
+    }
+}
+
+file = open("test.json","r")
+info = json.loads(file.read())
+file.close()
+
+
+def save(stats):
+    file = open("test.json","w")
+    json_object = json.dumps(stats)
+    file.write(json_object)
+    file.close()
 
 
 
@@ -221,13 +334,14 @@ while True:
             if wait <= 0:
                 exit()
         for i in range(len(l_buttons)):
-            l_buttons[i].draw(window)
+            l_buttons[i].draw_m(window)
         t1.draw_button_text(window)
         if wait >= 0:
             wait-=1
         if button_colision(150,100,307,200,mousePos,mouseState):
             game = 1
             main_menu = 0
+            shop = 0
             spawn_immunity = 300
             started_moving = False
             s1.body[0].x = 100
@@ -242,6 +356,45 @@ while True:
                 s1.head_pos.append([s1.body[0].x,s1.body[0].y])
             for i in range(s1.krugovi-1):
                 s1.body.append((Part(100,100,25,"body")))
+        if button_colision(150,100,307,375,mousePos,mouseState):
+            game = 0
+            main_menu = 0
+            shop = 1
+
+#.............................
+#.............................
+#.............................
+#.............................
+#.............................
+#.............................
+#.............................
+#.............................
+
+    if shop == 1:
+        window.fill("White")
+        b1.draw(shop,game)
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                shutdown(info,score)
+                wait = 30
+        if keys[pygame.K_ESCAPE]:
+            shutdown(info,score)
+            wait = 30
+        shopk.draw(window)
+        for i in range(len(l_buttons)):
+            l_buttons[i].draw_s(window)
+        l_buttons[0].draw_t(window)
+
+
+
+
+
+
+
 
 #.............................
 #.............................
@@ -255,18 +408,18 @@ while True:
         if started_moving == True:
             spawn_immunity -=1
         window.fill("White")
-        b1.draw()
+        b1.draw(shop,game)
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
         mouseState = pygame.mouse.get_pressed()
         mousePos = pygame.mouse.get_pos()
         for event in events:
             if event.type == pygame.QUIT:
-                shutdown()
-                wait = 90
+                shutdown(info,score)
+                wait = 30
         if keys[pygame.K_ESCAPE]:
-            shutdown()
-            wait = 90
+            shutdown(info,score)
+            wait = 30
         if collison(a1.x,a1.y,a1.rad,s1.body[0].x,s1.body[0].y,s1.rad):
             x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
             y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
@@ -282,6 +435,6 @@ while True:
         s1.move(keys)
         s1.draw(window)
         a1.draw(window)
-        t1.draw_score(s1.krugovi,score)
+        t1.draw_score(s1.krugovi,info,score)
     pygame.display.update()
     clock.tick(60)

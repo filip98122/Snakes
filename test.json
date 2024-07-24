@@ -1,8 +1,1 @@
-{
-    "highscore": 5,
-    "gold": 0,
-    "upgrades": 
-        {"2xspeed": false,
-        "DoubleFruit": false
-        }
-}
+{"gold": 0, "highscore": 43, "upgrades": {"fruit": 0}}
