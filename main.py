@@ -191,7 +191,7 @@ shopk = Storekeeper(625,605)
 
 
 class Button:
-    def __init__(self,x,y,width,height,ID):
+    def __init__(self,x,y,width,height,ID,text):
         self.x = x
         self.y = y
         self.width = width
@@ -200,37 +200,30 @@ class Button:
         self.myfont = pygame.font.SysFont('Comic Sans MS', 70)
         self.myfont1 = pygame.font.SysFont('Comic Sans MS', 15)
         self.myfont2 = pygame.font.SysFont('Comic Sans MS', 45)
+        self.text = text
     def draw_m(self,window):
         if self.ID == "main_menu":
             pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
     def draw_s(self,window):
         if self.ID == "shop":
             pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
-    def draw_t(self,window):
-        text_surface = self.myfont2.render(f"Geon", True, (255, 255, 255))
-        window.blit(text_surface,(63,185))
-        
-        text_surface1 = self.myfont2.render(f"Gold", True, (255, 255, 255))
-        window.blit(text_surface1,(240,185))
-        
-        text_surface2 = self.myfont1.render(f"Multiplyer", True, (255, 255, 255))
-        #window.blit(text_surface2,(240,385))
-
-        
+    def draw_t(self,window,main,shop):
+        text_surface = self.myfont2.render(f"{self.text}", True, (255, 255, 255))
+        window.blit(text_surface,(self.x,self.y))
         
         
 l_buttons = []
-button = Button(307,200,150,100,"main_menu")
+button = Button(330,200,150,100,"main_menu","Play")
 l_buttons.append(button)
-button = Button(307,375,150,100,"main_menu")
+button = Button(330,375,150,100,"main_menu","Shop")
 l_buttons.append(button)
-button = Button(40,175,150,100,"shop")
+button = Button(40,175,150,100,"shop","Geon")
 l_buttons.append(button)
-button = Button(215,175,150,100,"shop")
+button = Button(215,175,150,100,"shop","Blod")
 l_buttons.append(button)
-button = Button(390,175,150,100,"shop")
+button = Button(390,175,150,100,"shop","Starter")
 l_buttons.append(button)
-button = Button(565,175,150,100,"shop")
+button = Button(565,175,150,100,"shop","Fruit")
 l_buttons.append(button)
 
 
@@ -320,7 +313,7 @@ def save(stats):
 
 while True:
     if main_menu == 1:
-        window.fill("White")
+        window.fill("Blue")
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
         mouseState = pygame.mouse.get_pressed()
@@ -360,7 +353,9 @@ while True:
             game = 0
             main_menu = 0
             shop = 1
-
+        for i in range(len(l_buttons)):
+            if l_buttons[i].ID == "main_menu":
+                l_buttons[i].draw_t(window,main_menu,shop)
 #.............................
 #.............................
 #.............................
@@ -387,7 +382,10 @@ while True:
         shopk.draw(window)
         for i in range(len(l_buttons)):
             l_buttons[i].draw_s(window)
-        l_buttons[0].draw_t(window)
+            
+        for i in range(len(l_buttons)):
+            if l_buttons[i].ID == "shop":
+                l_buttons[i].draw_t(window,main_menu,shop)
 
 
 
