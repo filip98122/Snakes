@@ -472,9 +472,9 @@ while True:
                         info = read()
                         gold = info["gold"]
                         if gold-minus > l_buttons[i].cost:
-                            if info[l_buttons[i].reward] == 0:
-                                minus+=l_buttons[i].cost
-                                if l_buttons[i].type == "skin":
+                            if l_buttons[i].type == "skin":
+                                if info["skins"][l_buttons[i].reward] == 0:
+                                    minus+=l_buttons[i].cost
                                     write_skins(info,l_buttons[i].reward)
                     else:
                         game = 0
@@ -522,7 +522,7 @@ while True:
 #.............................
     if game == 1:
         if count==0:
-            sound0.set_pos(start=0)
+            sound2.play()
         if started_moving == True:
             spawn_immunity -=1
         window.fill("White")
@@ -545,7 +545,7 @@ while True:
             sound0.stop()
             sound2.stop()
             sound1.play()
-            count = 30
+            count = 20
             for i in range(s1.krugovi):
                 if collison(x_a,y_a,a1.rad,s1.body[i].x,s1.body[i].y,s1.rad):
                     x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
