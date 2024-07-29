@@ -214,23 +214,40 @@ class Button:
         self.cost = cost
         self.reward = reward
         self.type = type
+        self.sx = 0
+        self.sy = 0
     def draw_m(self,window):
         if self.ID == "main_menu":
             pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
     def draw_s(self,window):
         if self.ID == "shop":
             pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
+    def draw_d(self,window):
+        if self.ID == "dressing_room":
+            pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
     def draw_t(self,window,main,shop):
-        text_surface = self.myfont2.render(f"{self.text}", True, (255, 255, 255))
-        window.blit(text_surface,(self.x,self.y))
+        if self.width == 150:
+            self.sx = 23
+        if self.height == 100:
+            self.sy = 15
+        if self.text == "<" or self.text == ">":
+            text_surface = pygame.font.SysFont('Comic Sans MS', 125).render(f"{self.text}", True, (255, 255, 255))
+            window.blit(text_surface,(self.x+15,self.y-50))
+        else:
+            text_surface = self.myfont2.render(f"{self.text}", True, (255, 255, 255))
+            window.blit(text_surface,(self.x+self.sx,self.y+self.sy))
+        self.sx = 0
+        self.sy = 0
         
-        
+
+
+
 l_buttons = []
 button = Button(75,630,150,100,"main_menu","Play",0,"","")
 l_buttons.append(button)
 button = Button(575,630,150,100,"main_menu","Shop",0,"","")
 l_buttons.append(button)
-button = Button(40,175,150,100,"shop","Geon",5,"geon","skin")
+button = Button(40,175,150,100,"shop","Geon",150,"geon","skin")
 l_buttons.append(button)
 button = Button(215,175,150,100,"shop","Blod",150,"blod","skin")
 l_buttons.append(button)
@@ -238,6 +255,14 @@ button = Button(390,175,150,100,"shop","Basic",50,"basic","skin")
 l_buttons.append(button)
 button = Button(565,175,150,100,"shop","Fruit",50,"","upgrade")
 l_buttons.append(button)
+button = Button(40,575,325,100,"shop","Dressing room",50,"","")
+l_buttons.append(button)
+button = Button(40,325,75,100,"dressing_room","<",50,"","")
+l_buttons.append(button)
+button = Button(640,325,75,100,"dressing_room",">",50,"","")
+l_buttons.append(button)
+
+
 
 
 class Text:
@@ -302,10 +327,12 @@ def shutdown(info):
     global game
     global main_menu
     global score
+    global dressing_room
     write(info,score,info['gold'])
     score = 0
     game = 0
     main_menu = 1
+    dressing_room = 0
     shop = 0
 
 
@@ -325,7 +352,7 @@ spawn_immunity = 300
 started_moving = False
 main_menu = 0
 wait = 0
-
+dressing_room = 0
 
 dict_1 = {
     "gold": 0,
@@ -373,6 +400,7 @@ while True:
             game = 1
             main_menu = 0
             shop = 0
+            dressing_room = 0
             spawn_immunity = 300
             started_moving = False
             s1.body[0].x = 100
@@ -391,6 +419,7 @@ while True:
             game = 0
             main_menu = 0
             shop = 1
+            dressing_room = 0
         for i in range(len(l_buttons)):
             if l_buttons[i].ID == "main_menu":
                 l_buttons[i].draw_t(window,main_menu,shop)
@@ -411,33 +440,67 @@ while True:
         events = pygame.event.get()
         mouseState = pygame.mouse.get_pressed()
         mousePos = pygame.mouse.get_pos()
-        for event in events:
-            if event.type == pygame.QUIT:
+        if wait <= 0:
+            for event in events:
+                if event.type == pygame.QUIT:
+                    shutdown(info)
+                    wait = 30
+            if keys[pygame.K_ESCAPE]:
                 shutdown(info)
                 wait = 30
-        if keys[pygame.K_ESCAPE]:
-            shutdown(info)
-            wait = 30
         shopk.draw(window)
         for i in range(len(l_buttons)):
             l_buttons[i].draw_s(window)
-            
+        if wait >= 0:
+            wait-=1
         for i in range(len(l_buttons)):
             if l_buttons[i].ID == "shop":
                 l_buttons[i].draw_t(window,main_menu,shop)
                 if button_colision(l_buttons[i].width,l_buttons[i].height,l_buttons[i].x,l_buttons[i].y,mousePos,mouseState):
-                    info = read()
-                    gold = info["gold"]
-                    if gold-minus > l_buttons[i].cost:
-                        if info[l_buttons[i].reward] == 0:
-                            minus+=l_buttons[i].cost
-                            if l_buttons[i].type == "skin":
-                                write_skins(info,l_buttons[i].reward)
+                    if l_buttons[i].type == "skin" or l_buttons[i].type == "upgrade":
+                        info = read()
+                        gold = info["gold"]
+                        if gold-minus > l_buttons[i].cost:
+                            if info[l_buttons[i].reward] == 0:
+                                minus+=l_buttons[i].cost
+                                if l_buttons[i].type == "skin":
+                                    write_skins(info,l_buttons[i].reward)
+                    else:
+                        game = 0
+                        main_menu = 0
+                        shop = 0
+                        dressing_room = 1
 
-
-
-
-
+    if dressing_room == 1:
+        
+        window.fill("White")
+        b1.draw(dressing_room,game)
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                score = 0
+                game = 0
+                main_menu = 0
+                dressing_room = 0
+                shop = 1
+                wait = 30
+        if keys[pygame.K_ESCAPE]:
+            score = 0
+            game = 0
+            main_menu = 0
+            dressing_room = 0
+            shop = 1
+            wait = 30
+        for i in range(len(l_buttons)):
+            l_buttons[i].draw_d(window)
+        if wait >= 0:
+            wait-=1
+        for i in range(len(l_buttons)):
+            if l_buttons[i].ID == "dressing_room":
+                l_buttons[i].draw_t(window,main_menu,shop)
 #.............................
 #.............................
 #.............................
