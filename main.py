@@ -5,6 +5,7 @@ import math
 import time
 import json
 pygame.init()
+pygame.mixer.init()
 def collison(x1,y1,r1,x2,y2,r2):
     dx = x2 - x1
     dy = y2 - y1
@@ -28,10 +29,9 @@ def button_colision(width,height,x,y,mousePos,mouseState):
     else:
         return False
     
-    
-    
-    
-    
+sound0 = pygame.mixer.Sound('sci_fi.wav')
+sound1 = pygame.mixer.Sound('Eat_apple.wav')
+sound2 = pygame.mixer.Sound('game_music.wav')
     
     
 class Backround:
@@ -323,6 +323,8 @@ def write(info,score,gold):
 
 
 def shutdown(info):
+    global sound1
+    global sound0
     global shop
     global game
     global main_menu
@@ -334,14 +336,17 @@ def shutdown(info):
     main_menu = 1
     dressing_room = 0
     shop = 0
+    sound0.stop()
+    sound1.stop()
+
+
+#sound0 = pygame.mixer.Sound('sci_fi.wav')
+#sound1 = pygame.mixer.Sound('Eat_apple.wav')
+#sound2 = pygame.mixer.Sound('game_music.wav')
 
 
 
-
-
-
-
-
+count = 0
 b1 = Backround(window)
 t1 = Text(window)
 x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
@@ -377,6 +382,7 @@ def save(stats):
 minus = 0
 while True:
     if main_menu == 1:
+        sound2.play()
         window.fill("Blue")
         b1.draw(shop,game)
         keys = pygame.key.get_pressed()
@@ -409,6 +415,8 @@ while True:
             s1.body[0].dx = 0
             s1.body[0].dy = 0
             score = 0
+            sound1.stop()
+            sound2.stop()
             del s1.body
             s1.body = [(Part(100,100,25,"head"))]
             for i in range(600):
@@ -434,6 +442,7 @@ while True:
 #.............................
 
     if shop == 1:
+        sound2.play()
         window.fill("White")
         b1.draw(shop,game)
         keys = pygame.key.get_pressed()
@@ -447,6 +456,8 @@ while True:
                     wait = 30
             if keys[pygame.K_ESCAPE]:
                 shutdown(info)
+                sound0.stop()
+                sound1.stop()
                 wait = 30
         shopk.draw(window)
         for i in range(len(l_buttons)):
@@ -472,7 +483,7 @@ while True:
                         dressing_room = 1
 
     if dressing_room == 1:
-        
+        sound2.play()
         window.fill("White")
         b1.draw(dressing_room,game)
         keys = pygame.key.get_pressed()
@@ -510,6 +521,8 @@ while True:
 #.............................
 #.............................
     if game == 1:
+        if count==0:
+            sound0.set_pos(start=0)
         if started_moving == True:
             spawn_immunity -=1
         window.fill("White")
@@ -528,15 +541,23 @@ while True:
         if collison(a1.x,a1.y,a1.rad,s1.body[0].x,s1.body[0].y,s1.rad):
             x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
             y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
+            
+            sound0.stop()
+            sound2.stop()
+            sound1.play()
+            count = 30
             for i in range(s1.krugovi):
                 if collison(x_a,y_a,a1.rad,s1.body[i].x,s1.body[i].y,s1.rad):
                     x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
                     y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
+            
             a1 = Apple(x_a,y_a,35)
             s1.krugovi += 1
             s1.body.append(Part(-50,-50,s1.rad,"body"))
             s1.amount_to_track+=60
             score+=1
+        if count!=0:
+            count-=1
         s1.move(keys)
         s1.draw(window)
         a1.draw(window)
