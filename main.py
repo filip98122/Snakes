@@ -82,15 +82,15 @@ class Part:
         self.dx = 0
         self.dy = 0
         self.id = id
-    def draw(self,window):
+    def draw(self,window,color,color1):
         if self.id == "head":
-                pygame.draw.circle(window,pygame.Color(255,255,0),(self.x,self.y),self.rad)
-                pygame.draw.circle(window,pygame.Color(255,100,10),(self.x,self.y),self.rad-10)
+                pygame.draw.circle(window,pygame.Color(color),(self.x,self.y),self.rad)
+                pygame.draw.circle(window,pygame.Color(color1),(self.x,self.y),self.rad-10)
                 pygame.draw.circle(window,pygame.Color(0,0,0),(self.x,self.y-7),5)
                 pygame.draw.circle(window,pygame.Color(0,0,0),(self.x,self.y+7),5)
         if self.id == "body":
-                pygame.draw.circle(window,pygame.Color(255,255,0),(self.x,self.y),self.rad)
-                pygame.draw.circle(window,pygame.Color(255,100,10),(self.x,self.y),self.rad-10)
+                pygame.draw.circle(window,pygame.Color(color),(self.x,self.y),self.rad)
+                pygame.draw.circle(window,pygame.Color(color1),(self.x,self.y),self.rad-10)
                 
                 
                 
@@ -112,7 +112,7 @@ class Snake:
             self.body.append(Part(x-self.distance*i,y,self.rad,"body"))
     def draw(self,window):
         for i in range(len(self.body)-1,-1,-1):
-            self.body[i].draw(window)
+            self.body[i].draw(window,"Yellow",(255,100,10))
     def move(self, keys):
         global started_moving
         tmp_start_x = self.body[0].x
@@ -214,8 +214,8 @@ class Button:
         self.cost = cost
         self.reward = reward
         self.type = type
-        self.sx = 0
-        self.sy = 0
+        self.ux = 0
+        self.uy = 0
     def draw_m(self,window):
         if self.ID == "main_menu":
             pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
@@ -226,18 +226,40 @@ class Button:
         if self.ID == "dressing_room":
             pygame.draw.rect(window,"Black",pygame.Rect(self.x,self.y,self.width,self.height))
     def draw_t(self,window,main,shop):
+        info = read()
+        self.scale = 0.25
+        self.scale1 = 0.2
+        self.sprite_img = pygame.image.load('check.png')
+        self.width1 = self.sprite_img.get_width()*self.scale
+        self.height1 = self.sprite_img.get_height()*self.scale1
+        self.scaled_img1 = pygame.transform.scale(self.sprite_img, (self.width1, self.height1))
+        
+        
+        
         if self.width == 150:
-            self.sx = 23
+            self.ux = 23
         if self.height == 100:
-            self.sy = 15
+            self.uy = 15
         if self.text == "<" or self.text == ">":
             text_surface = pygame.font.SysFont('Comic Sans MS', 125).render(f"{self.text}", True, (255, 255, 255))
             window.blit(text_surface,(self.x+15,self.y-50))
         else:
             text_surface = self.myfont2.render(f"{self.text}", True, (255, 255, 255))
-            window.blit(text_surface,(self.x+self.sx,self.y+self.sy))
-        self.sx = 0
-        self.sy = 0
+            window.blit(text_surface,(self.x+self.ux,self.y+self.uy))
+        if shop == 1:
+            if self.cost != 0:
+                if self.type == "skin":
+                    text_surface1 = self.myfont2.render(f"{self.cost}", True, (255, 255, 255))
+                    window.blit(text_surface1,(self.x+self.ux+25,self.y+self.uy+175))
+                    if info["skins"][self.reward] != 0:
+                        window.blit(self.scaled_img1,(self.x+self.width//4,self.y+self.height*3))
+                else:
+                    text_surface1 = self.myfont2.render(f"{self.cost}", True, (255, 255, 255))
+                    window.blit(text_surface1,(self.x+self.ux+25,self.y+self.uy+100))
+                    if info["upgrades"][self.reward] != 0:
+                        window.blit(self.scaled_img1,(self.x+self.width//4,self.y+self.height*2))
+        self.ux = 0
+        self.uy = 0
         
 
 
@@ -247,19 +269,19 @@ button = Button(75,630,150,100,"main_menu","Play",0,"","")
 l_buttons.append(button)
 button = Button(575,630,150,100,"main_menu","Shop",0,"","")
 l_buttons.append(button)
-button = Button(40,175,150,100,"shop","Geon",150,"geon","skin")
+button = Button(40,175,150,100,"shop","Flame",150,"geon","skin")
 l_buttons.append(button)
 button = Button(215,175,150,100,"shop","Blod",150,"blod","skin")
 l_buttons.append(button)
 button = Button(390,175,150,100,"shop","Basic",50,"basic","skin")
 l_buttons.append(button)
-button = Button(565,175,150,100,"shop","Fruit",50,"","upgrade")
+button = Button(565,175,150,100,"shop","Fruit",50,"fruit","upgrade")
 l_buttons.append(button)
-button = Button(40,575,325,100,"shop","Dressing room",50,"","")
+button = Button(40,575,325,100,"shop","Dressing room",0,"","")
 l_buttons.append(button)
-button = Button(40,325,75,100,"dressing_room","<",50,"","")
+button = Button(40,325,75,100,"dressing_room","<",0,"","")
 l_buttons.append(button)
-button = Button(640,325,75,100,"dressing_room",">",50,"","")
+button = Button(640,325,75,100,"dressing_room",">",0,"","")
 l_buttons.append(button)
 
 
@@ -290,8 +312,11 @@ shop = 0
 game = 1
 
 
-
-
+def draw_samples(x,y,color,color1,color2,rad,third):
+    pygame.draw.circle(window,pygame.Color(color),(x,y),rad)
+    pygame.draw.circle(window,pygame.Color(color1),(x,y),rad-10)
+    if third == True:
+            pygame.draw.circle(window,pygame.Color(color2),(x,y),rad-20)
 
 def write_skins(info,reward):
     info["skins"][reward] = 1
@@ -346,6 +371,7 @@ def shutdown(info):
 
 
 
+SOUND = 0
 count = 0
 b1 = Backround(window)
 t1 = Text(window)
@@ -382,7 +408,8 @@ def save(stats):
 minus = 0
 while True:
     if main_menu == 1:
-        sound2.play()
+        if SOUND == 1:
+            sound2.play()
         window.fill("Blue")
         b1.draw(shop,game)
         keys = pygame.key.get_pressed()
@@ -442,7 +469,8 @@ while True:
 #.............................
 
     if shop == 1:
-        sound2.play()
+        if SOUND == 1:
+            sound2.play()
         window.fill("White")
         b1.draw(shop,game)
         keys = pygame.key.get_pressed()
@@ -464,6 +492,13 @@ while True:
             l_buttons[i].draw_s(window)
         if wait >= 0:
             wait-=1
+            
+        
+
+        draw_samples(l_buttons[2].x+l_buttons[2].width//2,l_buttons[2].y+l_buttons[2].height*1.5,(255,255,255),(255,0,0),(255,255,255),s1.rad,True)
+        draw_samples(l_buttons[3].x+l_buttons[3].width//2,l_buttons[3].y+l_buttons[3].height*1.5,(229,184,11),(0,0,125),(255,255,255),s1.rad,False)
+        draw_samples(l_buttons[4].x+l_buttons[4].width//2,l_buttons[4].y+l_buttons[4].height*1.5,(0,235,0),(0,75,0),(255,255,255),s1.rad,False)
+
         for i in range(len(l_buttons)):
             if l_buttons[i].ID == "shop":
                 l_buttons[i].draw_t(window,main_menu,shop)
@@ -483,7 +518,8 @@ while True:
                         dressing_room = 1
 
     if dressing_room == 1:
-        sound2.play()
+        if SOUND == 1:
+            sound2.play()
         window.fill("White")
         b1.draw(dressing_room,game)
         keys = pygame.key.get_pressed()
@@ -522,7 +558,8 @@ while True:
 #.............................
     if game == 1:
         if count==0:
-            sound2.play()
+            if SOUND == 1:
+                sound2.play()
         if started_moving == True:
             spawn_immunity -=1
         window.fill("White")
@@ -538,6 +575,10 @@ while True:
         if keys[pygame.K_ESCAPE]:
             shutdown(info)
             wait = 30
+            
+            
+        # Apple collision
+        
         if collison(a1.x,a1.y,a1.rad,s1.body[0].x,s1.body[0].y,s1.rad):
             x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
             y_a = random.randint(s1.rad+s1.rad//2,HEIGHT-s1.rad-s1.rad//2)
