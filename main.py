@@ -29,7 +29,7 @@ def button_colision(width,height,x,y,mousePos,mouseState):
     else:
         return False
     
-sound0 = pygame.mixer.Sound('sci_fi.wav')
+sound0 = pygame.mixer.Sound('game1.mp3')
 sound1 = pygame.mixer.Sound('Eat_apple.wav')
 sound2 = pygame.mixer.Sound('game_music.wav')
     
@@ -318,6 +318,14 @@ def draw_samples(x,y,color,color1,color2,rad,third):
     if third == True:
             pygame.draw.circle(window,pygame.Color(color2),(x,y),rad-20)
 
+def write_upgrades(info,reward):
+    info["upgrades"][reward] = 1
+    f = open("test.json", "w")
+    info = json.dumps(info)
+    f.write(info)
+    f.close()
+
+
 def write_skins(info,reward):
     info["skins"][reward] = 1
     f = open("test.json", "w")
@@ -371,7 +379,7 @@ def shutdown(info):
 
 
 
-SOUND = 0
+SOUND = 1
 count = 0
 b1 = Backround(window)
 t1 = Text(window)
@@ -506,11 +514,21 @@ while True:
                     if l_buttons[i].type == "skin" or l_buttons[i].type == "upgrade":
                         info = read()
                         gold = info["gold"]
-                        if gold-minus > l_buttons[i].cost:
-                            if l_buttons[i].type == "skin":
-                                if info["skins"][l_buttons[i].reward] == 0:
+                        if l_buttons[i].type == "skin":
+                            if info["skins"][l_buttons[i].reward] == 0:
+                                if gold-minus >= l_buttons[i].cost:
                                     minus+=l_buttons[i].cost
                                     write_skins(info,l_buttons[i].reward)
+                                
+                                
+                        else:
+                            if info["upgrades"][l_buttons[i].reward] == 0:
+                                if gold-minus >= l_buttons[i].cost:
+                                    minus+=l_buttons[i].cost
+                                    write_upgrades(info,l_buttons[i].reward)
+                        
+                    
+                    
                     else:
                         game = 0
                         main_menu = 0
@@ -559,7 +577,7 @@ while True:
     if game == 1:
         if count==0:
             if SOUND == 1:
-                sound2.play()
+                sound0.play()
         if started_moving == True:
             spawn_immunity -=1
         window.fill("White")
@@ -586,7 +604,7 @@ while True:
             sound0.stop()
             sound2.stop()
             sound1.play()
-            count = 20
+            count = 5
             for i in range(s1.krugovi):
                 if collison(x_a,y_a,a1.rad,s1.body[i].x,s1.body[i].y,s1.rad):
                     x_a = random.randint(s1.rad+s1.rad//2,WIDTH-s1.rad-s1.rad//2)
