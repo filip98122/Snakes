@@ -283,7 +283,8 @@ button = Button(40,325,75,100,"dressing_room","<",0,"","")
 l_buttons.append(button)
 button = Button(640,325,75,100,"dressing_room",">",0,"","")
 l_buttons.append(button)
-
+button = Button(265,450,150,100,"dressing_room","Equip",0,"","")
+l_buttons.append(button)
 
 
 
@@ -294,7 +295,7 @@ class Text:
         self.myfont2 = pygame.font.SysFont('Comic Sans MS', 45)
         self.window = window
     def draw_score(self,kru,game_info,score):
-        text_surface = self.myfont1.render(f"Score: {int(kru-5)}", True, (0, 0, 0))
+        text_surface = self.myfont1.render(f"Score: {score}", True, (0, 0, 0))
         self.window.blit(text_surface,(10,10))
         hs = game_info["highscore"]
         if hs<score:
@@ -311,6 +312,11 @@ score = 0
 shop = 0
 game = 1
 
+def draw_samps(samp,color,color1,color2):
+        pygame.draw.circle(window,pygame.Color(color),(340,375),25)
+        pygame.draw.circle(window,pygame.Color(color1),(340,375),15)
+        if samp == 0:
+                pygame.draw.circle(window,pygame.Color(color2),(340,375),5)
 
 def draw_samples(x,y,color,color1,color2,rad,third):
     pygame.draw.circle(window,pygame.Color(color),(x,y),rad)
@@ -345,7 +351,7 @@ def read(): # returns all gane info
 def write(info,score,gold):
     global minus
     hs = info["highscore"]
-    if score>hs:
+    if score*(info["upgrades"]['fruit']+1)>hs:
         info["highscore"] = score
     info["gold"] += (score-minus)
     minus = 0
@@ -377,7 +383,10 @@ def shutdown(info):
 #sound1 = pygame.mixer.Sound('Eat_apple.wav')
 #sound2 = pygame.mixer.Sound('game_music.wav')
 
-
+def not_bought(window):
+    myfont = pygame.font.SysFont('Comic Sans MS', 45)
+    text_surface = myfont.render(f"Not Bought", True, (255, 255, 255))
+    window.blit(text_surface,(240,600))
 
 SOUND = 1
 count = 0
@@ -392,6 +401,7 @@ started_moving = False
 main_menu = 0
 wait = 0
 dressing_room = 0
+sample = 0
 
 dict_1 = {
     "gold": 0,
@@ -481,6 +491,8 @@ while True:
             sound2.play()
         window.fill("White")
         b1.draw(shop,game)
+        text_surface = pygame.font.SysFont("Comic Sans MS", 25).render(f'Gold: {info["gold"]}', True, (0, 0, 0))
+        window.blit(text_surface,(10,10))
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
         mouseState = pygame.mouse.get_pressed()
@@ -489,12 +501,15 @@ while True:
             for event in events:
                 if event.type == pygame.QUIT:
                     shutdown(info)
-                    wait = 30
+                    shutdown(info)
+                    sound0.stop()
+                    sound1.stop()
+                    wait = 15
             if keys[pygame.K_ESCAPE]:
                 shutdown(info)
                 sound0.stop()
                 sound1.stop()
-                wait = 30
+                wait = 15
         shopk.draw(window)
         for i in range(len(l_buttons)):
             l_buttons[i].draw_s(window)
@@ -566,6 +581,44 @@ while True:
         for i in range(len(l_buttons)):
             if l_buttons[i].ID == "dressing_room":
                 l_buttons[i].draw_t(window,main_menu,shop)
+        if wait <= 0:
+            if button_colision(l_buttons[7].width,l_buttons[7].height,l_buttons[7].x,l_buttons[7].y,mousePos,mouseState):
+                sample-=1
+                wait = 30
+            if button_colision(l_buttons[8].width,l_buttons[8].height,l_buttons[8].x,l_buttons[8].y,mousePos,mouseState):
+                sample+=1
+                wait = 30
+            if button_colision(l_buttons[9].width,l_buttons[9].height,l_buttons[9].x,l_buttons[8].y,mousePos,mouseState):
+                if sample == 0:
+                    info = read()
+                    if info["skins"]["geon"] == 1:
+                        info["skins"]["geon"] = 2
+                if sample == 1:
+                    info = read()
+                    if info["skins"]["blod"] == 1:
+                        info["skins"]["blod"] = 2
+                if sample == 2:
+                    info = read()
+                    if info["skins"]["basic"] == 1:
+                        info["skins"]["basic"] = 2
+        
+        
+        if sample == 0:
+            draw_samps(sample,(255,255,255),(255,0,0),(255,255,255))
+            if info["skins"]["geon"] == 0:
+                not_bought(window)
+        if sample == 1:
+            draw_samps(sample,(229,184,11),(0,0,125),(255,255,255))
+            if info["skins"]["blod"] == 0:
+                not_bought(window)
+        if sample == 2:
+            draw_samps(sample,(0,235,0),(0,75,0),(255,255,255))
+            if info["skins"]["basic"] == 0:
+                not_bought(window)
+        if sample == -1:
+            sample = 2
+        if sample == 3:
+            sample = 0
 #.............................
 #.............................
 #.............................
@@ -614,7 +667,8 @@ while True:
             s1.krugovi += 1
             s1.body.append(Part(-50,-50,s1.rad,"body"))
             s1.amount_to_track+=60
-            score+=1
+            info = read()
+            score+=(1*(info["upgrades"]['fruit']+1))
         if count!=0:
             count-=1
         s1.move(keys)
