@@ -79,18 +79,19 @@ class Part:
         self.x = x
         self.y = y
         self.rad = rad
+        self.scale= 0.4
+        self.sprite_img = pygame.image.load('Zmija.png')
+        self.width = self.sprite_img.get_width()*self.scale
+        self.height = self.sprite_img.get_height()*self.scale
+        self.scaled_img = pygame.transform.scale(self.sprite_img, (self.width, self.height))
         self.dx = 0
         self.dy = 0
         self.id = id
     def draw(self,window,color,color1):
+        window.blit(self.scaled_img, (self.x-self.rad,self.y-self.rad))
         if self.id == "head":
-                pygame.draw.circle(window,pygame.Color(color),(self.x,self.y),self.rad)
-                pygame.draw.circle(window,pygame.Color(color1),(self.x,self.y),self.rad-10)
-                pygame.draw.circle(window,pygame.Color(0,0,0),(self.x,self.y-7),5)
-                pygame.draw.circle(window,pygame.Color(0,0,0),(self.x,self.y+7),5)
-        if self.id == "body":
-                pygame.draw.circle(window,pygame.Color(color),(self.x,self.y),self.rad)
-                pygame.draw.circle(window,pygame.Color(color1),(self.x,self.y),self.rad-10)
+            pygame.draw.circle(window,pygame.Color(0,0,0),(self.x,self.y-7),5)
+            pygame.draw.circle(window,pygame.Color(0,0,0),(self.x,self.y+7),5)
                 
                 
                 
@@ -491,7 +492,7 @@ while True:
             sound2.play()
         window.fill("White")
         b1.draw(shop,game)
-        text_surface = pygame.font.SysFont("Comic Sans MS", 25).render(f'Gold: {info["gold"]}', True, (0, 0, 0))
+        text_surface = pygame.font.SysFont("Comic Sans MS", 25).render(f'Gold: {info["gold"]-minus}', True, (0, 0, 0))
         window.blit(text_surface,(10,10))
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
