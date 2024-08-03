@@ -79,8 +79,8 @@ class Part:
         self.x = x
         self.y = y
         self.rad = rad
-        self.scale= 0.4
-        self.sprite_img = pygame.image.load('Zmija.png')
+        self.scale= 0.085
+        self.sprite_img = pygame.image.load('ghae.png')
         self.width = self.sprite_img.get_width()*self.scale
         self.height = self.sprite_img.get_height()*self.scale
         self.scaled_img = pygame.transform.scale(self.sprite_img, (self.width, self.height))
@@ -88,7 +88,22 @@ class Part:
         self.dy = 0
         self.id = id
     def draw(self,window,color,color1):
-        window.blit(self.scaled_img, (self.x-self.rad,self.y-self.rad))
+        info = read()
+        if info["skins"]["geon"] == 2:
+            pygame.draw.circle(window,pygame.Color("White"),(self.x,self.y),25)
+            pygame.draw.circle(window,pygame.Color("Red"),(self.x,self.y),15)
+            pygame.draw.circle(window,pygame.Color("White"),(self.x,self.y),5)
+            
+        if info["skins"]["blod"] == 2:
+            pygame.draw.circle(window,pygame.Color(229,184,11),(self.x,self.y),25)
+            pygame.draw.circle(window,pygame.Color(0,0,125),(self.x,self.y),15)
+            
+            
+        if info["skins"]["basic"] == 2:
+            pygame.draw.circle(window,pygame.Color(0,235,0),(self.x,self.y),25)
+            pygame.draw.circle(window,pygame.Color(0,75,0),(self.x,self.y),15)
+        if info["skins"]["geon"] != 2 and info["skins"]["blod"] != 2 and info["skins"]["basic"] != 2:
+            window.blit(self.scaled_img, (self.x-self.rad,self.y-self.rad))
         if self.id == "head":
             pygame.draw.circle(window,pygame.Color(0,0,0),(self.x,self.y-7),5)
             pygame.draw.circle(window,pygame.Color(0,0,0),(self.x,self.y+7),5)
@@ -589,30 +604,96 @@ while True:
             if button_colision(l_buttons[8].width,l_buttons[8].height,l_buttons[8].x,l_buttons[8].y,mousePos,mouseState):
                 sample+=1
                 wait = 30
-            if button_colision(l_buttons[9].width,l_buttons[9].height,l_buttons[9].x,l_buttons[8].y,mousePos,mouseState):
+            if button_colision(l_buttons[9].width,l_buttons[9].height,l_buttons[9].x,l_buttons[9].y,mousePos,mouseState):
+                wait = 30
                 if sample == 0:
                     info = read()
                     if info["skins"]["geon"] == 1:
                         info["skins"]["geon"] = 2
+                        
+                        if info["skins"]["blod"] == 2:
+                            info["skins"]["blod"] = 1
+                            
+                        if info["skins"]["basic"] == 2:
+                            info["skins"]["basic"] = 1
+                            
+                        f = open("test.json", "w")
+                        info = json.dumps(info)
+                        f.write(info)
+                        f.close()
+                        
+                    else:
+                        info = read()
+                        if info["skins"]["geon"] == 2:
+                            info["skins"]["geon"] = 1
+                            f = open("test.json", "w")
+                            info = json.dumps(info)
+                            f.write(info)
+                            f.close()
+                        
                 if sample == 1:
                     info = read()
                     if info["skins"]["blod"] == 1:
                         info["skins"]["blod"] = 2
+                        
+                        if info["skins"]["geon"] == 2:
+                            info["skins"]["geon"] = 1
+                            
+                        if info["skins"]["basic"] == 2:
+                            info["skins"]["basic"] = 1
+                            
+                        f = open("test.json", "w")
+                        info = json.dumps(info)
+                        f.write(info)
+                        f.close()
+                    
+                    else:
+                        info = read()
+                        if info["skins"]["blod"] == 2:
+                            info["skins"]["blod"] = 1
+                            f = open("test.json", "w")
+                            info = json.dumps(info)
+                            f.write(info)
+                            f.close()
+                        
                 if sample == 2:
                     info = read()
                     if info["skins"]["basic"] == 1:
                         info["skins"]["basic"] = 2
-        
+                        
+                        if info["skins"]["blod"] == 2:
+                            info["skins"]["blod"] = 1
+                            
+                        if info["skins"]["geon"] == 2:
+                            info["skins"]["geon"] = 1
+                            
+                        
+                        f = open("test.json", "w")
+                        info = json.dumps(info)
+                        f.write(info)
+                        f.close()
+                        
+                    else:
+                        info = read()
+                        if info["skins"]["basic"] == 2:
+                            info["skins"]["basic"] = 1
+                            f = open("test.json", "w")
+                            info = json.dumps(info)
+                            f.write(info)
+                            f.close()
         
         if sample == 0:
+            info = read()
             draw_samps(sample,(255,255,255),(255,0,0),(255,255,255))
             if info["skins"]["geon"] == 0:
                 not_bought(window)
         if sample == 1:
+            info = read()
             draw_samps(sample,(229,184,11),(0,0,125),(255,255,255))
             if info["skins"]["blod"] == 0:
                 not_bought(window)
         if sample == 2:
+            info = read()
             draw_samps(sample,(0,235,0),(0,75,0),(255,255,255))
             if info["skins"]["basic"] == 0:
                 not_bought(window)
