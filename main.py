@@ -4,8 +4,28 @@ import random
 import math
 import time
 import json
+from cryptography.fernet import Fernet
 pygame.init()
 pygame.mixer.init()
+keyE = b'nL5cTPi0324Gk2zgRDR6E4Y2iVHfWnrKu4kGzcB1ZnU='
+f=Fernet(keyE)
+def ens():
+    f=Fernet(keyE)
+    with open("test.json", "rb") as file:
+        file_data = file.read()
+    encrypted_data = f.encrypt(file_data)
+    with open("test.json", "wb") as file:
+        file.write(encrypted_data)
+def end():
+    f=Fernet(keyE)
+    with open("test.json", "rb") as file:
+        encrypted_data = file.read()
+    decrypted_data = f.decrypt(encrypted_data)
+    with open("test.json", "wb") as file:
+        file.write(decrypted_data)
+
+end()
+
 def collison(x1,y1,r1,x2,y2,r2):
     dx = x2 - x1
     dy = y2 - y1
@@ -437,8 +457,8 @@ def save(stats):
     json_object = json.dumps(stats)
     file.write(json_object)
     file.close()
-
-
+    
+    
 minus = 0
 while True:
     if main_menu == 1:
@@ -453,10 +473,13 @@ while True:
         for event in events:
             if event.type == pygame.QUIT:
                 if wait <= 0:
+                    ens()
                     exit()
+                    
                 
         if keys[pygame.K_ESCAPE]:
             if wait <= 0:
+                ens()
                 exit()
         for i in range(len(l_buttons)):
             l_buttons[i].draw_m(window)
@@ -501,7 +524,6 @@ while True:
 #.............................
 #.............................
 #.............................
-
     if shop == 1:
         if SOUND == 1:
             sound2.play()
