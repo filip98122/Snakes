@@ -235,6 +235,32 @@ shopk = Storekeeper(625,605)
 
 
 
+class Portal:
+    def __init__(self,x,y,cn):
+        self.x = x
+        self.y = y
+        self.cn = cn
+        self.scale = 0.5
+        self.sprite_img = pygame.image.load('portal.png')
+        self.width = self.sprite_img.get_width()*self.scale
+        self.height = self.sprite_img.get_height()*self.scale
+        self.scaled_img = pygame.transform.scale(self.sprite_img, (self.width, self.height))
+    def draw(self,window):
+        window.blit(self.scaled_img,(self.x-self.width//2,self.y-self.height//2))
+
+
+wait0 = 0
+wait1 = 0
+l_p = []
+X_p = random.randint(50,603)
+y_p = random.randint(50,220)
+p1 = Portal(X_p,y_p,0)
+l_p.append(p1)
+X_p = random.randint(50,603)
+y_p = random.randint(330,544)
+p1 = Portal(X_p,y_p,0)
+l_p.append(p1)
+
 
 class Button:
     def __init__(self,x,y,width,height,ID,text,cost,reward,type):
@@ -778,6 +804,38 @@ while True:
         s1.move(keys)
         s1.draw(window)
         a1.draw(window)
+        for i in range(len(l_p)):
+            l_p[i].draw(window)
+            l_p[i].cn +=1
+            if l_p[i].cn == 600:
+                if i == 0:
+                    X_p = random.randint(50,603)
+                    y_p = random.randint(50,220)
+
+                else:
+                    X_p = random.randint(50,603)
+                    y_p = random.randint(330,544)
+                l_p[i].x = X_p
+                l_p[i].y = y_p
+                l_p[i].cn = 0
+            for j in range(len(s1.body)):
+                if collison(s1.body[j].x,s1.body[j].y,s1.rad,l_p[i].x,l_p[i].y,56):
+                    if wait0==0:
+                        if i == 0:
+                            s1.body[0].x = l_p[1].x+l_p[1].width//2
+                            s1.body[0].y = l_p[1].y+l_p[1].height//2
+                            wait1 = 90
+                    if wait1==0:
+                        if i == 1:
+                            s1.body[0].x = l_p[0].x+l_p[0].width//2
+                            s1.body[0].y = l_p[0].y+l_p[0].height//2
+                            wait0 = 90
+        if wait0 < 0:
+            wait0-=1
+        if wait1<0:
+            wait1-=0
+            
+        
         t1.draw_score(s1.krugovi,info,score)
     pygame.display.update()
     clock.tick(60)
