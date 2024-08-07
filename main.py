@@ -52,8 +52,8 @@ def button_colision(width,height,x,y,mousePos,mouseState):
 sound0 = pygame.mixer.Sound('game1.mp3')
 sound1 = pygame.mixer.Sound('Eat_apple.wav')
 sound2 = pygame.mixer.Sound('game_music.wav')
-    
-    
+
+
 class Backround:
     def __init__(self,window):
         self.window = window
@@ -87,12 +87,7 @@ class Backround:
             self.width = self.scaled_img.get_width()
             self.height = self.scaled_img.get_height()
             window.blit(self.scaled_img, (0,0))
-            
-            
-            
-            
-            
-            
+
             
 class Part:
     def __init__(self,x,y,rad,id):
@@ -151,6 +146,7 @@ class Snake:
             self.body[i].draw(window,"Yellow",(255,100,10))
     def move(self, keys):
         global started_moving
+        global portal_im
         tmp_start_x = self.body[0].x
         tmp_start_y = self.body[0].y
         
@@ -161,9 +157,10 @@ class Snake:
             self.body[i].y = self.head_pos[len(self.head_pos)-self.distance*i][1]
         for i in range(2,self.krugovi):
             if spawn_immunity<=0:
-                if collison(self.body[0].x,self.body[0].y,self.rad,self.body[i].x,self.body[i].y,self.rad):
-                    shutdown(info)
-                    pass
+                if portal_im == 0:
+                    if collison(self.body[0].x,self.body[0].y,self.rad,self.body[i].x,self.body[i].y,self.rad):
+                        shutdown(info)
+                        pass
 
         self.body[0].x += self.body[0].dx
         self.body[0].y += self.body[0].dy
@@ -252,8 +249,8 @@ class Portal:
 wait0 = 0
 wait1 = 0
 l_p = []
-X_p = random.randint(50,603)
-y_p = random.randint(50,220)
+X_p = random.randint(206,603)
+y_p = random.randint(150,220)
 p1 = Portal(X_p,y_p,0)
 l_p.append(p1)
 X_p = random.randint(50,603)
@@ -413,7 +410,7 @@ def read(): # returns all gane info
 def write(info,score,gold):
     global minus
     hs = info["highscore"]
-    if score*(info["upgrades"]['fruit']+1)>hs:
+    if score>hs:
         info["highscore"] = score
     info["gold"] += (score-minus)
     minus = 0
@@ -449,7 +446,7 @@ def not_bought(window):
     myfont = pygame.font.SysFont('Comic Sans MS', 45)
     text_surface = myfont.render(f"Not Bought", True, (255, 255, 255))
     window.blit(text_surface,(240,600))
-
+portal_im = 0
 SOUND = 1
 count = 0
 b1 = Backround(window)
@@ -809,8 +806,8 @@ while True:
             l_p[i].cn +=1
             if l_p[i].cn == 600:
                 if i == 0:
-                    X_p = random.randint(50,603)
-                    y_p = random.randint(50,220)
+                    X_p = random.randint(206,603)
+                    y_p = random.randint(150,220)
 
                 else:
                     X_p = random.randint(50,603)
@@ -818,24 +815,26 @@ while True:
                 l_p[i].x = X_p
                 l_p[i].y = y_p
                 l_p[i].cn = 0
-            for j in range(len(s1.body)):
-                if collison(s1.body[j].x,s1.body[j].y,s1.rad,l_p[i].x,l_p[i].y,56):
-                    if wait0==0:
-                        if i == 0:
-                            s1.body[0].x = l_p[1].x+l_p[1].width//2
-                            s1.body[0].y = l_p[1].y+l_p[1].height//2
-                            wait1 = 90
-                    if wait1==0:
-                        if i == 1:
-                            s1.body[0].x = l_p[0].x+l_p[0].width//2
-                            s1.body[0].y = l_p[0].y+l_p[0].height//2
-                            wait0 = 90
-        if wait0 < 0:
+            if collison(s1.body[0].x,s1.body[0].y,s1.rad,l_p[i].x,l_p[i].y,35):
+                if wait0==0:
+                    if i == 0:
+                        s1.body[0].x = l_p[1].x
+                        s1.body[0].y = l_p[1].y
+                        wait1 = 90
+                        
+                if wait1==0:
+                    if i == 1:
+                        s1.body[0].x = l_p[0].x
+                        s1.body[0].y = l_p[0].y
+                        wait0 = 90
+                        
+        if wait0 > 0:
             wait0-=1
-        if wait1<0:
-            wait1-=0
-            
-        
+        if wait1>0:
+            wait1-=1
+        if portal_im > 0:
+            portal_im-=1
+        s1.draw(window)
         t1.draw_score(s1.krugovi,info,score)
     pygame.display.update()
     clock.tick(60)
