@@ -447,7 +447,7 @@ def not_bought(window):
     text_surface = myfont.render(f"Not Bought", True, (255, 255, 255))
     window.blit(text_surface,(240,600))
 portal_im = 0
-SOUND = 1
+SOUND = 0
 count = 0
 b1 = Backround(window)
 t1 = Text(window)
@@ -821,13 +821,19 @@ while True:
                         s1.body[0].x = l_p[1].x
                         s1.body[0].y = l_p[1].y
                         wait1 = 90
-                        
+                        if l_p[0].cn+(s1.krugovi-1)*60>600:
+                            l_p[1].cn-=((s1.krugovi-1)*60+l_p[1].cn)-600
+                            l_p[0].cn-=((s1.krugovi-1)*60+l_p[0].cn)-600
                 if wait1==0:
                     if i == 1:
                         s1.body[0].x = l_p[0].x
                         s1.body[0].y = l_p[0].y
                         wait0 = 90
-                        
+                        if l_p[1].cn+(s1.krugovi-1)*60>600:
+                            l_p[1].cn-=((s1.krugovi-1)*60+l_p[1].cn)-600
+                            l_p[0].cn-=((s1.krugovi-1)*60+l_p[0].cn)-600
+
+
         if wait0 > 0:
             wait0-=1
         if wait1>0:
