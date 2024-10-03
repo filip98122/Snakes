@@ -16,6 +16,8 @@ def ens():
     encrypted_data = f.encrypt(file_data)
     with open("test.json", "wb") as file:
         file.write(encrypted_data)
+        
+
 def end():
     f=Fernet(keyE)
     with open("test.json", "rb") as file:
@@ -447,7 +449,7 @@ def not_bought(window):
     text_surface = myfont.render(f"Not Bought", True, (255, 255, 255))
     window.blit(text_surface,(240,600))
 portal_im = 0
-SOUND = 0
+SOUND = 1
 count = 0
 b1 = Backround(window)
 t1 = Text(window)
